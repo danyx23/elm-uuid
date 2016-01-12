@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Uuid Example</title>
+  </head>
+  <body>
+    <script src="minimal.js"></script>
+    <script>
+      Elm.fullscreen(Elm.MinimalExample,
+        {randomSeed: [Math.floor(Math.random()*0xFFFFFFFF), Math.floor(Math.random()*0xFFFFFFFF)] })
+    </script>
+  </body>
+</html>
