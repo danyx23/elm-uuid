@@ -136,9 +136,14 @@ fromString text =
   else
     Nothing
 
-type UuidGenerator 
-  = UuidGenerator (Generator Uuid)
+{- Generator typed to Uuids
+-}
+type alias UuidGenerator 
+  = Generator Uuid
 
+{- Map an integer in the range 0-15 to a hexadecimal character
+-}
+mapToHex : Int -> Char
 mapToHex index =
   let
     maybeResult = (flip Array.get <| hexDigits) index
@@ -149,16 +154,27 @@ mapToHex index =
       Just result ->
         result
 
+hexGenerator : Generator Int
 hexGenerator =
   int 0 15   
 
-uuidGenerator : Generator Uuid
+uuidGenerator : UuidGenerator
 uuidGenerator =
   map createUuid (list 31 hexGenerator)
 
+limitDigitRange8ToB : Int -> Int
 limitDigitRange8ToB digit =
   digit `Bitwise.and` 3 `Bitwise.or` 8 
 
+{- Create a valid V4 Uuid from a list of 31 hex values. The final
+Uuid has 32 hex characters with 4 seperators. One of the characters
+is fixed to 4 to indicate the version, and one is limited to the range
+[8-B] (indicated with Y in the sample string):
+xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx
+Currently, the internal representation is the canonical string representation
+but that might change in the future, e.g. to 4 32 bit values.
+-}
+createUuid : List Int -> Uuid
 createUuid thirtyOneHexDigits =
   String.concat
   [ thirtyOneHexDigits |> List.take 8 |> (List.map mapToHex) |> String.fromList
@@ -175,9 +191,11 @@ createUuid thirtyOneHexDigits =
   ]
   |> Uuid
   
+uuidRegex : Regex.Regex
 uuidRegex =
   Regex.regex "^[0-9A-Fa-f]{8,8}-[0-9A-Fa-f]{4,4}-4[0-9A-Fa-f]{3,3}-[8-9A-Ba-b][0-9A-Fa-f]{3,3}-[0-9A-Fa-f]{12,12}$"
   
+hexDigits : Array.Array Char
 hexDigits = 
   let
     mapChars offset digit = Char.fromCode <| digit + offset
