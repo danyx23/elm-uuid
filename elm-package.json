@@ -5,10 +5,12 @@
     "license": "BSD3",
     "source-directories": [
         ".",
-        "./src"
+        "./src",
+        "./src/Uuid"
     ],
     "exposed-modules": [
-        "Uuid"
+        "Uuid",
+        "Uuid.Barebones"
     ],
     "dependencies": {
         "elm-lang/core": "3.0.0 <= v < 4.0.0",        

@@ -2,7 +2,7 @@ module Uuid
   ( Uuid
   , toString
   , fromString
-  , generate
+  , uuidGenerator
   ) where
   
 {-| This modules provides an opaque type for Uuids, helpers to serialize
@@ -12,9 +12,20 @@ Random.PCG pseudo-random generator library.
 Uuids are Universally Unique IDentifiers. They are 128 bit ids that are
 designed to be extremely unlikely to collide with other Uuids.
 
-This library only supports Version 4 Uuid (those generated using random numbers,
-as opposed to hashing. See [Wikipedia on Uuids](https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29) 
+This library only supports generating Version 4 Uuid (those generated using 
+random numbers, as opposed to hashing. See 
+[Wikipedia on Uuids](https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29) 
 for more details). Version 4 Uuids are constructed using 122 pseudo random bits.
+
+Disclaimer: If you use this Library to generate Uuids, please be advised
+that it does not use a cryptographically secure pseudo random number generator.
+While Random.PCG is a definite improvement over Elms native RNG, depending
+on your use case the randomness provided may not be enough.  
+
+This library is split into two Modules. Uuid (this module) wraps Uuids in
+an opaque type for improved type safety. If you prefer to simply get strings
+you can use the Uuid.Barebones module which provides methods to generate
+and verify Uuid as plain Strings.
 
 Uuids can be generated either by parsing them from the canonical string representation
 (see fromString) or by generating them. If you are unfamiliar with random number generation
@@ -33,7 +44,7 @@ Here is a complete example that shows how to initialize the random number seed
 and how to carry the returned seed forward to the next Uuid generation.
 
     import Uuid
-    import Random.PCG exposing (Seed, initialSeed2)
+    import Random.PCG exposing (generate, Seed, initialSeed2)
     import StartApp.Simple exposing (start)
     import Html exposing (Html, div, button, text)
     import Html.Events exposing (onClick)
@@ -66,7 +77,7 @@ and how to carry the returned seed forward to the next Uuid generation.
       case action of 
         NewUuid ->
           let
-            (newUuid, newSeed) = Uuid.generate model.currentSeed
+            (newUuid, newSeed) = generate Uuid.uuidGenerator model.currentSeed
           in
           { model
           | currentUuid = Just newUuid
@@ -94,7 +105,7 @@ and how to carry the returned seed forward to the next Uuid generation.
         , view = view
         }
 
-@docs Uuid, generate, fromString, toString
+@docs Uuid, uuidGenerator, fromString, toString
 -}
 
 import String
@@ -104,19 +115,13 @@ import Char
 import Regex
 import Bitwise
 import Random.PCG exposing (Generator, map, list, int, generate, Seed)
+import Uuid.Barebones exposing (..)
 
 {-| Uuid type. Represents a 128 bit Uuid (Version 4) 
 -}
 type Uuid 
   = Uuid String
-
-{-| Generate a new pair of Uuid and Seed. Don't forget to store the returned
-Seed and provide that one the next time you call generate! 
--}
-generate : Seed -> (Uuid, Seed)
-generate seed =
-  Random.PCG.generate uuidGenerator seed
-  
+ 
 {-| Create a string representation from a Uuid in the canonical 8-4-4-4-12 form, i.e. 
 "63B9AAA2-6AAF-473E-B37E-22EB66E66B76"
 -}
@@ -126,79 +131,24 @@ toString (Uuid internalString) =
 
 {-| Create a Uuid from a String in the canonical form (e.g. 
 "63B9AAA2-6AAF-473E-B37E-22EB66E66B76"). Note that this module only supports 
-Version 4 Uuids and will refuse to parse other Uuid versions (i.e. only Uuids 
-in the form xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx will be successfully parsed)
+canonical Uuids, Versions 1-5 and will refuse to parse other Uuid variants 
+(i.e. only Uuids in the form xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx will be 
+successfully parsed)
 -}
 fromString : String -> Maybe Uuid
 fromString text =
-  if Regex.contains uuidRegex text then
+  if isValidUuid text then
     Just <| Uuid text
   else
     Nothing
 
-{- Generator typed to Uuids
+{-| Random.PCG Generator for Uuids. Using this Generator instead of the generate
+function let's you use the full power of the Random.PCG to create lists of Uuids, 
+map them to other types etc. 
 -}
-type alias UuidGenerator 
-  = Generator Uuid
-
-{- Map an integer in the range 0-15 to a hexadecimal character
--}
-mapToHex : Int -> Char
-mapToHex index =
-  let
-    maybeResult = (flip Array.get <| hexDigits) index
-  in
-    case maybeResult of
-      Nothing ->
-        'x'
-      Just result ->
-        result
-
-hexGenerator : Generator Int
-hexGenerator =
-  int 0 15   
-
-uuidGenerator : UuidGenerator
+uuidGenerator : Generator Uuid
 uuidGenerator =
-  map createUuid (list 31 hexGenerator)
-
-limitDigitRange8ToB : Int -> Int
-limitDigitRange8ToB digit =
-  digit `Bitwise.and` 3 `Bitwise.or` 8 
-
-{- Create a valid V4 Uuid from a list of 31 hex values. The final
-Uuid has 32 hex characters with 4 seperators. One of the characters
-is fixed to 4 to indicate the version, and one is limited to the range
-[8-B] (indicated with Y in the sample string):
-xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx
-Currently, the internal representation is the canonical string representation
-but that might change in the future, e.g. to 4 32 bit values.
--}
-createUuid : List Int -> Uuid
-createUuid thirtyOneHexDigits =
-  String.concat
-  [ thirtyOneHexDigits |> List.take 8 |> (List.map mapToHex) |> String.fromList
-  , "-"
-  , thirtyOneHexDigits |> List.drop 8 |> List.take 4|> (List.map mapToHex) |> String.fromList
-  , "-"
-  , "4"
-  , thirtyOneHexDigits |> List.drop 12 |> List.take 3|> (List.map mapToHex) |> String.fromList
-  , "-"
-  , thirtyOneHexDigits |> List.drop 15 |> List.take 1|> (List.map limitDigitRange8ToB) |> (List.map mapToHex) |> String.fromList
-  , thirtyOneHexDigits |> List.drop 16 |> List.take 3|> (List.map mapToHex) |> String.fromList
-  , "-"
-  , thirtyOneHexDigits |> List.drop 19 |> List.take 12|> (List.map mapToHex) |> String.fromList
-  ]
-  |> Uuid
+  map Uuid uuidStringGenerator
   
-uuidRegex : Regex.Regex
-uuidRegex =
-  Regex.regex "^[0-9A-Fa-f]{8,8}-[0-9A-Fa-f]{4,4}-4[0-9A-Fa-f]{3,3}-[8-9A-Ba-b][0-9A-Fa-f]{3,3}-[0-9A-Fa-f]{12,12}$"
+
   
-hexDigits : Array.Array Char
-hexDigits = 
-  let
-    mapChars offset digit = Char.fromCode <| digit + offset
-  in
-    (List.map (mapChars 48) [0..9]) ++ (List.map (mapChars 65) [0..5])
-    |> Array.fromList

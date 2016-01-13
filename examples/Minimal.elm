@@ -1,11 +1,10 @@
 module MinimalExample 
   ( main
-    
   )
   where
 
 import Uuid
-import Random.PCG exposing (Seed, initialSeed2)
+import Random.PCG exposing (Seed, initialSeed2, generate)
 import StartApp.Simple exposing (start)
 import Html exposing (Html, div, button, text)
 import Html.Events exposing (onClick)
@@ -31,7 +30,7 @@ update action model =
   case action of 
     NewUuid ->
       let
-        (newUuid, newSeed) = Uuid.generate model.currentSeed
+        (newUuid, newSeed) = generate Uuid.uuidGenerator model.currentSeed
       in
       { model
       | currentUuid = Just newUuid
