@@ -108,12 +108,6 @@ and how to carry the returned seed forward to the next Uuid generation.
 @docs Uuid, uuidGenerator, fromString, toString
 -}
 
-import String
-import List
-import Array
-import Char
-import Regex
-import Bitwise
 import Random.PCG exposing (Generator, map, list, int, generate, Seed)
 import Uuid.Barebones exposing (..)
 
