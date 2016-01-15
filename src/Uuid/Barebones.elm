@@ -21,9 +21,8 @@ import Bitwise
 import Random.PCG exposing (Generator, map, list, int, generate, Seed)
 
 {-| Random.PCG Generator for Uuid Strings. Using this Generator instead of the generate
-function let's you use the full power of the Random.PCG library to create lists of Uuids,
-map them to other types
-etc. 
+function lets you use the full power of the Random.PCG library to create lists of Uuids,
+map them to other types etc. 
 -}
 uuidStringGenerator : Generator String
 uuidStringGenerator =
@@ -42,8 +41,6 @@ Uuid has 32 hex characters with 4 seperators. One of the characters
 is fixed to 4 to indicate the version, and one is limited to the range
 [8-B] (indicated with Y in the sample string):
 xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx
-Currently, the internal representation is the canonical string representation
-but that might change in the future, e.g. to 4 32 bit values.
 -}
 toUuidString : List Int -> String
 toUuidString thirtyOneHexDigits =
