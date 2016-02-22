@@ -4,7 +4,6 @@ install:
   - cd tests
   - elm-package install -y
 before_script: 
-  - cd tests
   - elm-make --yes --output raw-test.js Tests.elm
   - bash elm-stuff/packages/laszlopandy/elm-console/1.0.2/elm-io.sh raw-test.js test.js
 script: node tests/test.js
