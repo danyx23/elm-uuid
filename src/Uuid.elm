@@ -109,6 +109,7 @@ and how to carry the returned seed forward to the next Uuid generation.
 -}
 
 import Random.PCG exposing (Generator, map, list, int, generate, Seed)
+import String
 import Uuid.Barebones exposing (..)
 
 {-| Uuid type. Represents a 128 bit Uuid (Version 4) 
@@ -130,7 +131,7 @@ canonical Uuids, Versions 1-5 and will refuse to parse other Uuid variants.
 fromString : String -> Maybe Uuid
 fromString text =
   if isValidUuid text then
-    Just <| Uuid text
+    Just <| Uuid <| String.toLower text
   else
     Nothing
 
