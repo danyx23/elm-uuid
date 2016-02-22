@@ -8,6 +8,7 @@ import Task
 
 import Tests
 
+
 console : IO ()
 console = consoleRunner Tests.all
 
