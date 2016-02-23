@@ -37,4 +37,6 @@ If you reuse a seed, you will create the same Uuid twice!
 
 Check out the example to see how this works in practice
 
+[![Build Status](https://travis-ci.org/danyx23/elm-uuid.svg?branch=master)](https://travis-ci.org/danyx23/elm-uuid)
+
 by Daniel Bachler
