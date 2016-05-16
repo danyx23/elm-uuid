@@ -7,9 +7,9 @@ Random.PCG pseudo-random generator library.
 Uuids are Universally Unique IDentifiers. They are 128 bit ids that are
 designed to be extremely unlikely to collide with other Uuids.
 
-This library only supports generating Version 4 Uuid (those generated using 
-random numbers, as opposed to hashing. See 
-[Wikipedia on Uuids](https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29) 
+This library only supports generating Version 4 Uuid (those generated using
+random numbers, as opposed to hashing. See
+[Wikipedia on Uuids](https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29)
 for more details). Version 4 Uuids are constructed using 122 pseudo random bits.
 
 Disclaimer: If you use this Library to generate Uuids, please be advised
@@ -27,13 +27,14 @@ Uuids can be generated either by parsing them from the canonical string represen
 in pure functional languages, this can be a bit confusing. The gist of it is that:
 
 1. you need a good random seed and this has to come from outside our wonderfully
-predictable Elm code (meaning you have to create an incoming port and feed in
-some initial randomness)
+predictable Elm code (meaning you have to either use programWithFlags and pass in
+initial random seeds or alternatively use the Core.Random generate Cmd introduced
+with Elm 0.17 to get random values)
 
-2. every call to generate a new Uuid will give you a tuple of a Uuid and a new 
+2. every call to generate a new Uuid will give you a tuple of a Uuid and a new
 seed. It is very important that whenever you generate a new Uuid you store this
-seed you get back into your model and use this one for the next Uuid generation. 
-If you reuse a seed, you will create the same Uuid twice! 
+seed you get back into your model and use this one for the next Uuid generation.
+If you reuse a seed, you will create the same Uuid twice!
 
 Check out the example to see how this works in practice
 
