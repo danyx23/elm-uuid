@@ -1,5 +1,5 @@
 {
-    "version": "1.0.2",
+    "version": "2.0.0",
     "summary": "Create UUIDs (Version 4) - 128 bit pseudo-random identifiers",
     "repository": "https://github.com/danyx23/elm-uuid.git",
     "license": "BSD3",
