@@ -5,10 +5,11 @@
     <title>Uuid Example</title>
   </head>
   <body>
-    <script src="minimal.js"></script>
+    <script src="Minimal.js"></script>
     <script>
-      Elm.fullscreen(Elm.MinimalExample,
-        {randomSeed: [Math.floor(Math.random()*0xFFFFFFFF), Math.floor(Math.random()*0xFFFFFFFF)] })
+      // here we pass in a (Int, Int) Tuple that is a 2 element array in JS land:
+      Elm.MinimalExample.fullscreen(
+        [Math.floor(Math.random()*0x0FFFFFFF), Math.floor(Math.random()*0x0FFFFFFF)])
     </script>
   </body>
 </html>
