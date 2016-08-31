@@ -1,95 +1,75 @@
 module Tests exposing (..)
 
-import Check exposing (claim, claimTrue, that, is, true, false, for, quickCheck)
-import Check.Test exposing (evidenceToTest)
-import Check.Investigator exposing (int)
-import ElmTest exposing (..)
+--import Check exposing (claim, claimTrue, that, is, true, false, for, quickCheck)
+--import Check.Test exposing (evidenceToTest)
+
+import Test exposing (..)
 import String
+import Expect
 import Uuid.Barebones exposing (..)
 import Uuid exposing (..)
-import Random.PCG exposing (generate, initialSeed)
+import Random.Pcg exposing (step, initialSeed)
 import Random
+import Fuzz
 import Shrink
-import Check.Investigator exposing (shrink, random, Investigator)
 
 
-uuidFromSeed : Int -> Uuid
-uuidFromSeed seed =
-    initialSeed seed
-        |> generate uuidGenerator
-        |> fst
+randomInt =
+    Random.Pcg.int Random.Pcg.minInt Random.Pcg.maxInt
 
 
-uuidInvestigator : Investigator Uuid
-uuidInvestigator =
+initialSeedFuzzer =
+    Fuzz.custom
+        (randomInt |> Random.Pcg.map Random.Pcg.initialSeed)
+        Shrink.noShrink
+
+
+buildUuid integer =
     let
-        generator =
-            Random.map uuidFromSeed (random int)
+        initialSeed =
+            Random.Pcg.initialSeed integer
+
+        ( uuid, seed ) =
+            step uuidGenerator initialSeed
     in
-        Investigator generator Shrink.noShrink
+        uuid
 
 
-claim_generated_uuid_strings_are_valid =
-    claim "Generated Uuids are valid"
-        `true` (\uuid ->
-                    Uuid.toString uuid
-                        |> isValidUuid
-               )
-        `for` uuidInvestigator
-
-
-claim_toString_fromString_roundtripping_works =
-    claim "Rount-tripping Uuids through toString -> fromString keeps the Uuids intact"
-        `that` (Uuid.toString >> Uuid.fromString)
-        `is` (\x -> Just x)
-        `for` uuidInvestigator
-
-
-claim_toString_fromString_roundtripping_works_with_uppercase =
-    claim "Rount-tripping Uuids through toString -> fromString keeps the Uuids intact, uppercasing is ignored"
-        `that` (Uuid.toString >> String.toUpper >> Uuid.fromString)
-        `is` (\x -> Just x)
-        `for` uuidInvestigator
-
-
-claim_toString_fromString_roundtripping_works_with_lowercase =
-    claim "Rount-tripping Uuids through toString -> fromString keeps the Uuids intact, uppercasing is ignored"
-        `that` (Uuid.toString >> String.toLower >> Uuid.fromString)
-        `is` (\x -> Just x)
-        `for` uuidInvestigator
-
-
-testSuite =
-    Check.suite "Quickcheck test suite 1"
-        [ claim_generated_uuid_strings_are_valid
-        , claim_toString_fromString_roundtripping_works
-        , claim_toString_fromString_roundtripping_works_with_uppercase
-        , claim_toString_fromString_roundtripping_works_with_lowercase
-        ]
-
-
-result : Check.Evidence
-result =
-    quickCheck testSuite
-
-
-quickCheckSuite : ElmTest.Test
-quickCheckSuite =
-    ElmTest.suite "Quickcheck suite"
-        [ evidenceToTest result ]
-
-
-unitTestSuite =
-    suite "Unit test suite"
-        [ test "isValid of valid uuid" (assert (isValidUuid "63B9AAA2-6AAF-473E-B37E-22EB66E66B76"))
-        , test "isValid of invalid uuid 1" (assert (not <| isValidUuid "a63B9AAA2-6AAF-473E-B37E-22EB66E66B76"))
-        , test "isValid of invalid uuid 2" (assert (not <| isValidUuid "63B9AAA2-6AAF-F73E-B37E-22EB66E66B76"))
-        ]
+uuidFuzzer =
+    Fuzz.custom (randomInt |> Random.Pcg.map buildUuid) Shrink.noShrink
 
 
 all : Test
 all =
-    suite "All tests"
-        [ unitTestSuite
-        , quickCheckSuite
+    describe "All tests"
+        [ test "isValid - for valid uuid" <|
+            \() -> Expect.true "should be valid" (isValidUuid "63B9AAA2-6AAF-473E-B37E-22EB66E66B76")
+        , test "isValid - for invalid uuid" <|
+            \() -> Expect.false "should be invalid" (isValidUuid "zz")
+        , fuzz initialSeedFuzzer "generate uuid" <|
+            \initialSeed ->
+                let
+                    ( uuid, nextSeed ) =
+                        step uuidGenerator initialSeed
+                in
+                    Expect.true "should be valid uuid" <| isValidUuid <| (Uuid.toString uuid)
+        , fuzz initialSeedFuzzer "generate two uuids" <|
+            \initialSeed ->
+                let
+                    ( uuid1, seed1 ) =
+                        step uuidGenerator initialSeed
+
+                    ( uuid2, seed2 ) =
+                        step uuidGenerator seed1
+                in
+                    Expect.notEqual uuid1 uuid2
+        , fuzz uuidFuzzer "roundtripping uuid through toString -> fromString keeps the Uuids intact" <|
+            \uuid ->
+                Expect.equal (Just uuid) (Uuid.fromString << Uuid.toString <| uuid)
+        , fuzz uuidFuzzer "roundtripping uuid through toString -> fromString keeps the Uuids intact - upper casing is ignored" <|
+            \uuid ->
+                Expect.equal (Just uuid) (Uuid.fromString << String.toUpper << Uuid.toString <| uuid)
+        , fuzz uuidFuzzer "roundtripping uuid through toString -> fromString keeps the Uuids intact - lower casing is ignored" <|
+            \uuid ->
+                Expect.equal (Just uuid) (Uuid.fromString << String.toLower << Uuid.toString <| uuid)
         ]
