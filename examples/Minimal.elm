@@ -4,9 +4,8 @@ module MinimalExample
         )
 
 import Uuid
-import Random.Pcg exposing (Seed, initialSeed2, step)
-import Html.App exposing (programWithFlags)
-import Html exposing (Html, div, button, text)
+import Random.Pcg exposing (Seed, initialSeed, step)
+import Html exposing (Html, div, button, text, programWithFlags)
 import Html.Events exposing (onClick)
 
 
@@ -55,22 +54,27 @@ view model =
             , text uuidText
             ]
 
-{- this init function takes a tuple of two ints that are handed over
-in the initializiation code of our Elm app in the javascript code. It
-uses these JS random values as the initial seed.
+
+
+{- this init function takes an int that is handed over
+   in the initializiation code of our Elm app in the javascript code. It
+   uses this JS random value as the initial seed.
 -}
-init : ( Int, Int ) -> ( Model, Cmd Msg )
-init ( seed1, seed2 ) =
-    ( { currentSeed = initialSeed2 seed1 seed2
+
+
+init : Int -> ( Model, Cmd Msg )
+init seed =
+    ( { currentSeed = initialSeed seed
       , currentUuid = Nothing
       }
     , Cmd.none
     )
 
 
-main : Program ( Int, Int )
+main : Program Int Model Msg
 main =
-    programWithFlags -- using programWithFlags to get the seed values from JS
+    programWithFlags
+        -- using programWithFlags to get the seed values from JS
         { init = init
         , update = update
         , view = view

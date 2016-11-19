@@ -43,6 +43,8 @@ isValidUuid uuidAsString =
    [8-B] (indicated with Y in the sample string):
    xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx
 -}
+
+
 toUuidString : List Int -> String
 toUuidString thirtyOneHexDigits =
     String.concat
@@ -62,7 +64,7 @@ toUuidString thirtyOneHexDigits =
 
 limitDigitRange8ToB : Int -> Int
 limitDigitRange8ToB digit =
-    digit `Bitwise.and` 3 `Bitwise.or` 8
+    Bitwise.or (Bitwise.and digit 3) 8
 
 
 uuidRegex : Regex.Regex
@@ -76,8 +78,8 @@ hexDigits =
         mapChars offset digit =
             Char.fromCode <| digit + offset
     in
-        (List.map (mapChars 48) [0..9])
-            ++ (List.map (mapChars 97) [0..5])
+        (List.map (mapChars 48) (List.range 0 9))
+            ++ (List.map (mapChars 97) (List.range 0 5))
             |> Array.fromList
 
 
