@@ -1,4 +1,4 @@
-module Uuid exposing (Uuid, toString, fromString, uuidGenerator)
+module Uuid exposing (Uuid, toString, fromString, uuidGenerator, encode, decoder)
 
 {-| This modules provides an opaque type for Uuids, helpers to serialize
 from and to String and helpers to generate new Uuids using Max Goldsteins
@@ -37,12 +37,14 @@ If you reuse a seed, you will create the same Uuid twice!
 
 Have a look at the examples in the package to see how to use it!
 
-@docs Uuid, uuidGenerator, fromString, toString
+@docs Uuid, uuidGenerator, fromString, toString, encode, decoder
 -}
 
 import Random.Pcg exposing (Generator, map, list, int, step, Seed)
 import String
 import Uuid.Barebones exposing (..)
+import Json.Decode as JD
+import Json.Encode as JE
 
 
 {-| Uuid type. Represents a 128 bit Uuid (Version 4)
@@ -78,3 +80,27 @@ map them to other types etc.
 uuidGenerator : Generator Uuid
 uuidGenerator =
     map Uuid uuidStringGenerator
+
+
+{-| Encode Uuid to Json
+-}
+encode : Uuid -> JE.Value
+encode =
+    toString
+        >> JE.string
+
+
+{-| Decoder for getting Uuid out of Json
+-}
+decoder : JD.Decoder Uuid
+decoder =
+    JD.string
+        |> JD.andThen
+            (\string ->
+                case fromString string of
+                    Just uuid ->
+                        JD.succeed uuid
+
+                    Nothing ->
+                        JD.fail "Not a valid UUID"
+            )
