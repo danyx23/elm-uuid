@@ -6,37 +6,40 @@ module Tests exposing (..)
 import Test exposing (..)
 import String
 import Expect
-import Uuid.Barebones exposing (..)
 import Uuid exposing (..)
-import Random.Pcg exposing (step, initialSeed)
-import Random
+import Random.Pcg.Extended as RandomE
+import Random.Pcg as RandomP
 import Fuzz
 import Shrink
 
 
+randomInt : RandomP.Generator Int
 randomInt =
-    Random.Pcg.int Random.Pcg.minInt Random.Pcg.maxInt
+    RandomP.int RandomP.minInt RandomP.maxInt
 
 
+buildUuid : Int -> Uuid
 buildUuid integer =
     let
         initialSeed =
-            Random.Pcg.initialSeed integer
+            RandomE.initialSeed integer []
 
         ( uuid, seed ) =
-            step uuidGenerator initialSeed
+            RandomE.step generator initialSeed
     in
         uuid
 
 
+initialSeedFuzzer : Fuzz.Fuzzer RandomE.Seed
 initialSeedFuzzer =
     Fuzz.custom
-        (randomInt |> Random.Pcg.map Random.Pcg.initialSeed)
+        (randomInt |> RandomP.map (\x -> RandomE.initialSeed x []))
         Shrink.noShrink
 
 
+uuidFuzzer : Fuzz.Fuzzer Uuid
 uuidFuzzer =
-    Fuzz.custom (randomInt |> Random.Pcg.map buildUuid) Shrink.noShrink
+    Fuzz.custom (randomInt |> RandomP.map buildUuid) Shrink.noShrink
 
 
 all : Test
@@ -56,7 +59,7 @@ all =
             \initialSeed ->
                 let
                     ( uuid, nextSeed ) =
-                        step uuidGenerator initialSeed
+                        RandomE.step generator initialSeed
                 in
                     uuid
                         |> Uuid.toString
@@ -66,10 +69,10 @@ all =
             \initialSeed ->
                 let
                     ( uuid1, seed1 ) =
-                        step uuidGenerator initialSeed
+                        RandomE.step generator initialSeed
 
                     ( uuid2, seed2 ) =
-                        step uuidGenerator seed1
+                        RandomE.step generator seed1
                 in
                     Expect.notEqual uuid1 uuid2
         , fuzz uuidFuzzer "roundtripping uuid through toString -> fromString keeps the Uuids intact" <|
