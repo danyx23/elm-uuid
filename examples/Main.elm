@@ -1,10 +1,7 @@
-module MinimalExample
-    exposing
-        ( main
-        )
+module Main exposing (main)
 
 import Uuid
-import Random.Pcg exposing (Seed, initialSeed, step)
+import Random.Pcg.Extended exposing (Seed, initialSeed, step)
 import Html exposing (Html, div, button, text, programWithFlags)
 import Html.Events exposing (onClick)
 
@@ -28,7 +25,7 @@ update msg model =
         NewUuid ->
             let
                 ( newUuid, newSeed ) =
-                    step Uuid.uuidGenerator model.currentSeed
+                    step Uuid.generator model.currentSeed
             in
                 ( { model
                     | currentUuid = Just newUuid
@@ -55,26 +52,22 @@ view model =
             ]
 
 
-
-{- this init function takes an int that is handed over
-   in the initializiation code of our Elm app in the javascript code. It
-   uses this JS random value as the initial seed.
+{-| To get enough bytes of randomness (128 bit), we have to pass at least 4 32-bit ints from JavaScript
+via flags. Here we pass 5, since having a seedExtension of a size that is a power of 2 results
+in slightly faster performance.
 -}
-
-
-init : Int -> ( Model, Cmd Msg )
-init seed =
-    ( { currentSeed = initialSeed seed
+init : ( Int, List Int ) -> ( Model, Cmd Msg )
+init ( seed, seedExtension ) =
+    ( { currentSeed = initialSeed seed seedExtension
       , currentUuid = Nothing
       }
     , Cmd.none
     )
 
 
-main : Program Int Model Msg
+main : Program ( Int, List Int ) Model Msg
 main =
     programWithFlags
-        -- using programWithFlags to get the seed values from JS
         { init = init
         , update = update
         , view = view

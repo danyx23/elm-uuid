@@ -1,5 +1,3 @@
 elm-stuff/
-src/elm-package.json
 documentation.json
-examples/index.html
-examples/Minimal.js
+examples/elm.js

@@ -1,13 +1,4 @@
-module Uuid.Barebones exposing (uuidStringGenerator, isValidUuid)
-
-{-| This is the Uuid.Barebones version that generates valid Uuids
-as Strings and provides a method to verify if a given String is a
-valid Uuid.
-
-See the main Uuid module docs for more information on how
-
-@docs uuidStringGenerator, isValidUuid
--}
+module Uuid.Barebones exposing (toUuidString, isValidUuid)
 
 import String
 import List
@@ -15,16 +6,6 @@ import Array
 import Char
 import Regex
 import Bitwise
-import Random.Pcg exposing (Generator, map, list, int, step, Seed)
-
-
-{-| Random.PCG Generator for Uuid Strings. Using this Generator instead of the generate
-function lets you use the full power of the Random.PCG library to create lists of Uuids,
-map them to other types etc.
--}
-uuidStringGenerator : Generator String
-uuidStringGenerator =
-    map toUuidString (list 31 hexGenerator)
 
 
 {-| Verification function to check if the given string is a valid Uuid in the canonical
@@ -36,15 +17,12 @@ isValidUuid uuidAsString =
     Regex.contains uuidRegex uuidAsString
 
 
-
-{- Create a valid V4 Uuid from a list of 31 hex values. The final
-   Uuid has 32 hex characters with 4 seperators. One of the characters
-   is fixed to 4 to indicate the version, and one is limited to the range
-   [8-B] (indicated with Y in the sample string):
-   xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx
+{-| Create a valid V4 Uuid from a list of 31 hex values. The final
+Uuid has 32 hex characters with 4 seperators. One of the characters
+is fixed to 4 to indicate the version, and one is limited to the range
+[8-B] (indicated with Y in the sample string):
+xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx
 -}
-
-
 toUuidString : List Int -> String
 toUuidString thirtyOneHexDigits =
     String.concat
@@ -99,8 +77,3 @@ mapToHex index =
 
             Just result ->
                 result
-
-
-hexGenerator : Generator Int
-hexGenerator =
-    int 0 15

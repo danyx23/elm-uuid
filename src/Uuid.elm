@@ -1,8 +1,9 @@
-module Uuid exposing (Uuid, toString, fromString, uuidGenerator, encode, decoder)
+module Uuid exposing (Uuid, toString, fromString, generator, stringGenerator, encode, decoder, isValidUuid)
 
 {-| This modules provides an opaque type for Uuids, helpers to serialize
-from and to String and helpers to generate new Uuids using Max Goldsteins
-Random.PCG pseudo-random generator library.
+from and to String and helpers to generate new Uuids using the
+[Random.Pcg.Extended](http://package.elm-lang.org/packages/Zinggi/elm-random-pcg-extended/latest)
+pseudo-random generator library.
 
 Uuids are Universally Unique IDentifiers. They are 128 bit ids that are
 designed to be extremely unlikely to collide with other Uuids.
@@ -12,35 +13,36 @@ random numbers, as opposed to hashing. See
 [Wikipedia on Uuids](https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29)
 for more details). Version 4 Uuids are constructed using 122 pseudo random bits.
 
-Disclaimer: If you use this Library to generate Uuids, please be advised
-that it does not use a cryptographically secure pseudo random number generator.
-While Random.PCG is a definite improvement over Elms native RNG, depending
-on your use case the randomness provided may not be enough.
-
-This library is split into two Modules. Uuid (this module) wraps Uuids in
-an opaque type for improved type safety. If you prefer to simply get strings
-you can use the Uuid.Barebones module which provides methods to generate
-and verify Uuid as plain Strings.
+**Disclaimer**: If you use this Library to generate Uuids, please make sure to correctly
+seed your random generator, as shown in the examples. **Don't** use the current time or something
+similar to seed the generator. If your generator isn't seeded properly, the chance of a collision
+between multiple clients is drastically increased!
 
 Uuids can be generated either by parsing them from the canonical string representation
-(see fromString) or by generating them. If you are unfamiliar with random number generation
+(see `fromString`) or by generating them. If you are unfamiliar with random number generation
 in pure functional languages, this can be a bit confusing. The gist of it is that:
 
-1. you need a good random seed and this has to come from outside our wonderfully
-predictable Elm code (meaning you have to create an incoming port and feed in
-some initial randomness)
+1.  you need a good random seed and this has to come from outside our wonderfully
+    predictable Elm code (meaning you have to create an incoming port and feed in
+    some initial randomness)
 
-2. every call to generate a new Uuid will give you a tuple of a Uuid and a new
-seed. It is very important that whenever you generate a new Uuid you store this
-seed you get back into your model and use this one for the next Uuid generation.
-If you reuse a seed, you will create the same Uuid twice!
+2.  every call to `generate` will give you a tuple of a Uuid and a new
+    seed. It is very important that whenever you generate a new Uuid you store this
+    seed you get back into your model and use this one for the next Uuid generation.
+    If you reuse a seed, you will create the same Uuid twice!
 
 Have a look at the examples in the package to see how to use it!
 
-@docs Uuid, uuidGenerator, fromString, toString, encode, decoder
+@docs Uuid, generator, fromString, toString, encode, decoder
+
+
+## Barebones
+
+@docs stringGenerator, isValidUuid
+
 -}
 
-import Random.Pcg exposing (Generator, map, list, int, step, Seed)
+import Random.Pcg.Extended exposing (Generator, map, list, int, step, Seed)
 import String
 import Uuid.Barebones exposing (..)
 import Json.Decode as JD
@@ -73,13 +75,16 @@ fromString text =
         Nothing
 
 
-{-| Random.PCG Generator for Uuids. Using this Generator instead of the generate
-function let's you use the full power of the Random.PCG to create lists of Uuids,
-map them to other types etc.
+{-| Random.Pcg.Extended generator for Uuids.
+
+To provide enough randomness, you should seed this generator with at least 4 32-bit integers
+that are aquired from JavaScript via `crypto.getRandomValues(...)`.
+See the examples on how to do this properly.
+
 -}
-uuidGenerator : Generator Uuid
-uuidGenerator =
-    map Uuid uuidStringGenerator
+generator : Generator Uuid
+generator =
+    map Uuid stringGenerator
 
 
 {-| Encode Uuid to Json
@@ -104,3 +109,26 @@ decoder =
                     Nothing ->
                         JD.fail "Not a valid UUID"
             )
+
+
+{-| Random.Pcg.Extended generator for Uuid Strings.
+-}
+stringGenerator : Generator String
+stringGenerator =
+    map toUuidString (list 31 hexGenerator)
+
+
+{-| Check if the given string is a valid UUID
+-}
+isValidUuid : String -> Bool
+isValidUuid =
+    Uuid.Barebones.isValidUuid
+
+
+
+-- Details
+
+
+hexGenerator : Generator Int
+hexGenerator =
+    int 0 15
