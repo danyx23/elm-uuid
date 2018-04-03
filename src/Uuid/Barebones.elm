@@ -61,10 +61,8 @@ hexDigits =
             |> Array.fromList
 
 
-
-{- Map an integer in the range 0-15 to a hexadecimal character -}
-
-
+{-| Map an integer in the range 0-15 to a hexadecimal character
+-}
 mapToHex : Int -> Char
 mapToHex index =
     let

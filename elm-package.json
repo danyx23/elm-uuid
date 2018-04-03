@@ -1,7 +1,7 @@
 {
-    "version": "2.1.0",
-    "summary": "Create UUIDs (Version 4) - 128 bit pseudo-random identifiers",
-    "repository": "https://github.com/danyx23/elm-uuid.git",
+    "version": "1.0.0",
+    "summary": "V4 UUIDs - 128 bit pseudo-random identifiers (Fork with more randomness)",
+    "repository": "https://github.com/Zinggi/elm-uuid.git",
     "license": "BSD3",
     "source-directories": [
         ".",

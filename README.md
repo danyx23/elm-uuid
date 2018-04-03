@@ -1,4 +1,8 @@
 # Elm Uuid
+**This is a Fork** from [danyx23/elm-uuid](https://github.com/danyx23/elm-uuid).
+It uses the [PCG-extended](http://package.elm-lang.org/packages/Zinggi/elm-random-pcg-extended/latest) PRNG to [provide enough randomness when generating UUIDs on different clients](https://github.com/danyx23/elm-uuid/issues/10).
+
+---
 
 This modules provides an opaque type for Uuids, helpers to serialize
 from and to String and helpers to generate new Uuids.
@@ -12,8 +16,7 @@ random numbers, as opposed to hashing. See
 for more details).
 
 
-Check out the example to see how this works in practice
+Check out the [example](https://github.com/Zinggi/elm-uuid/tree/master/examples) to see how this works in practice
 
-[![Build Status](https://travis-ci.org/danyx23/elm-uuid.svg?branch=master)](https://travis-ci.org/danyx23/elm-uuid)
 
-by Daniel Bachler
+Package originally by Daniel Bachler

@@ -27,6 +27,7 @@ update msg model =
                 ( newUuid, newSeed ) =
                     step Uuid.generator model.currentSeed
             in
+                -- 2.: Store the new seed
                 ( { model
                     | currentUuid = Just newUuid
                     , currentSeed = newSeed
@@ -52,7 +53,7 @@ view model =
             ]
 
 
-{-| To get enough bytes of randomness (128 bit), we have to pass at least 4 32-bit ints from JavaScript
+{-| 3.: To get enough bytes of randomness (128 bit), we have to pass at least 4 32-bit ints from JavaScript
 via flags. Here we pass 5, since having a seedExtension of a size that is a power of 2 results
 in slightly faster performance.
 -}
