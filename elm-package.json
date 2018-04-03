@@ -1,7 +1,7 @@
 {
-    "version": "2.1.0",
-    "summary": "Create UUIDs (Version 4) - 128 bit pseudo-random identifiers",
-    "repository": "https://github.com/danyx23/elm-uuid.git",
+    "version": "1.0.0",
+    "summary": "V4 UUIDs - 128 bit pseudo-random identifiers (Fork with more randomness)",
+    "repository": "https://github.com/Zinggi/elm-uuid.git",
     "license": "BSD3",
     "source-directories": [
         ".",
@@ -9,12 +9,11 @@
         "./src/Uuid"
     ],
     "exposed-modules": [
-        "Uuid",
-        "Uuid.Barebones"
+        "Uuid"
     ],
     "dependencies": {
-        "elm-lang/core": "5.0.0 <= v < 6.0.0",
-        "mgold/elm-random-pcg": "5.0.2 <= v < 6.0.0"
+        "Zinggi/elm-random-pcg-extended": "2.1.0 <= v < 3.0.0",
+        "elm-lang/core": "5.0.0 <= v < 6.0.0"
     },
     "elm-version": "0.18.0 <= v < 0.19.0"
 }
