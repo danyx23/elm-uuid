@@ -1,12 +1,11 @@
-module MinimalExample
-    exposing
-        ( main
-        )
+module MinimalExample exposing (main)
 
-import Uuid
-import Random.Pcg exposing (Seed, initialSeed, step)
-import Html exposing (Html, div, button, text, programWithFlags)
+import Browser exposing (element)
+import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
+import Random exposing (Seed, initialSeed, step)
+import Uuid
+
 
 
 -- 1.: In your elm code, store the seed and update it every time you create a new Uuid
@@ -30,12 +29,12 @@ update msg model =
                 ( newUuid, newSeed ) =
                     step Uuid.uuidGenerator model.currentSeed
             in
-                ( { model
-                    | currentUuid = Just newUuid
-                    , currentSeed = newSeed
-                  }
-                , Cmd.none
-                )
+            ( { model
+                | currentUuid = Just newUuid
+                , currentSeed = newSeed
+              }
+            , Cmd.none
+            )
 
 
 view : Model -> Html Msg
@@ -49,10 +48,10 @@ view model =
                 Just uuid ->
                     "Current Uuid: " ++ Uuid.toString uuid
     in
-        div []
-            [ button [ onClick NewUuid ] [ text "Create a new Uuid!" ]
-            , text uuidText
-            ]
+    div []
+        [ button [ onClick NewUuid ] [ text "Create a new Uuid!" ]
+        , text uuidText
+        ]
 
 
 
@@ -73,8 +72,8 @@ init seed =
 
 main : Program Int Model Msg
 main =
-    programWithFlags
-        -- using programWithFlags to get the seed values from JS
+    element
+        -- using flags to get the seed values from JS
         { init = init
         , update = update
         , view = view

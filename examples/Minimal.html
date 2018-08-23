@@ -3,11 +3,15 @@
   <head>
     <meta charset="utf-8">
     <title>Uuid Example</title>
+    <script src="Minimal.js"></script>
   </head>
   <body>
-    <script src="Minimal.js"></script>
+    <div id="elm"></div>
     <script>
-      Elm.MinimalExample.fullscreen(Math.floor(Math.random()*0x0FFFFFFF))
+    Elm.MinimalExample.init({
+        node: document.getElementById('elm'),
+        flags: Math.floor(Math.random()*0x0FFFFFFF)
+    });
     </script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-module Uuid exposing (Uuid, toString, fromString, uuidGenerator, encode, decoder)
+module Uuid exposing (Uuid, uuidGenerator, fromString, toString, encode, decoder)
 
 {-| This modules provides an opaque type for Uuids, helpers to serialize
 from and to String and helpers to generate new Uuids using Max Goldsteins
@@ -26,25 +26,26 @@ Uuids can be generated either by parsing them from the canonical string represen
 (see fromString) or by generating them. If you are unfamiliar with random number generation
 in pure functional languages, this can be a bit confusing. The gist of it is that:
 
-1. you need a good random seed and this has to come from outside our wonderfully
-predictable Elm code (meaning you have to create an incoming port and feed in
-some initial randomness)
+1.  you need a good random seed and this has to come from outside our wonderfully
+    predictable Elm code (meaning you have to create an incoming port and feed in
+    some initial randomness)
 
-2. every call to generate a new Uuid will give you a tuple of a Uuid and a new
-seed. It is very important that whenever you generate a new Uuid you store this
-seed you get back into your model and use this one for the next Uuid generation.
-If you reuse a seed, you will create the same Uuid twice!
+2.  every call to generate a new Uuid will give you a tuple of a Uuid and a new
+    seed. It is very important that whenever you generate a new Uuid you store this
+    seed you get back into your model and use this one for the next Uuid generation.
+    If you reuse a seed, you will create the same Uuid twice!
 
 Have a look at the examples in the package to see how to use it!
 
 @docs Uuid, uuidGenerator, fromString, toString, encode, decoder
+
 -}
 
-import Random.Pcg exposing (Generator, map, list, int, step, Seed)
-import String
-import Uuid.Barebones exposing (..)
 import Json.Decode as JD
 import Json.Encode as JE
+import Random exposing (Generator, Seed, int, list, map, step)
+import String
+import Uuid.Barebones exposing (..)
 
 
 {-| Uuid type. Represents a 128 bit Uuid (Version 4)
@@ -69,6 +70,7 @@ fromString : String -> Maybe Uuid
 fromString text =
     if isValidUuid text then
         Just <| Uuid <| String.toLower text
+
     else
         Nothing
 
