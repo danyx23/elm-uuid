@@ -1,9 +1,8 @@
 # Elm Uuid
 
-This modules provides an opaque type for Uuids, helpers to serialize
-from and to String and helpers to generate new Uuids using Max Goldsteins
-[Random.PCG](http://package.elm-lang.org/packages/mgold/elm-random-pcg/latest/Random-Pcg)
-pseudo-random generator library.
+This package provides an opaque type for Uuids, helpers to serialize
+from and to String and helpers to generate new Uuids using Elm's
+[Random](https://package.elm-lang.org/packages/elm/random/latest/) package.
 
 Uuids are Universally Unique IDentifiers. They are 128 bit ids that are
 designed to be extremely unlikely to collide with other Uuids.
@@ -15,11 +14,10 @@ for more details). Version 4 Uuids are constructed using 122 pseudo random bits.
 
 Disclaimer: If you use this Library to generate Uuids, please be advised
 that it does not use a cryptographically secure pseudo random number generator.
-While Random.PCG is a definite improvement over Elms native RNG, depending
-on your use case the randomness provided may not be enough. The
+Depending on your use case the randomness provided may not be enough. The
 period of the underlying random generator is high, so creating lot's of random
 UUIDs on one client is fine, but please be aware that since the initial random
-seed of the current Random.PCG implementation is limited to 32 bits, creating
+seed of the current Random implementation is limited to 32 bits, creating
 UUIDs on many independent clients may lead to collisions more quickly than you
 think (see https://github.com/danyx23/elm-uuid/issues/10 for details)!
 

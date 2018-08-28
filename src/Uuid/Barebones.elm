@@ -19,8 +19,8 @@ import Regex
 import String
 
 
-{-| Random.PCG Generator for Uuid Strings. Using this Generator instead of the generate
-function lets you use the full power of the Random.PCG library to create lists of Uuids,
+{-| Random Generator for Uuid Strings. Using this Generator instead of the generate
+function lets you use the full power of the Generator library to create lists of Uuids,
 map them to other types etc.
 -}
 uuidStringGenerator : Generator String
@@ -93,7 +93,7 @@ mapToHex : Int -> Char
 mapToHex index =
     let
         maybeResult =
-            ((\b a -> Array.get a b) <| hexDigits) index
+            Array.get index hexDigits
     in
     case maybeResult of
         Nothing ->

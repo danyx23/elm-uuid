@@ -1,8 +1,8 @@
 module Uuid exposing (Uuid, uuidGenerator, fromString, toString, encode, decoder)
 
-{-| This modules provides an opaque type for Uuids, helpers to serialize
-from and to String and helpers to generate new Uuids using Max Goldsteins
-Random.PCG pseudo-random generator library.
+{-| This module provides an opaque type for Uuids, helpers to serialize
+from and to String and helpers to generate new Uuids using Elm's
+[Random](https://package.elm-lang.org/packages/elm/random/latest/) package.
 
 Uuids are Universally Unique IDentifiers. They are 128 bit ids that are
 designed to be extremely unlikely to collide with other Uuids.
@@ -14,8 +14,12 @@ for more details). Version 4 Uuids are constructed using 122 pseudo random bits.
 
 Disclaimer: If you use this Library to generate Uuids, please be advised
 that it does not use a cryptographically secure pseudo random number generator.
-While Random.PCG is a definite improvement over Elms native RNG, depending
-on your use case the randomness provided may not be enough.
+Depending on your use case the randomness provided may not be enough. The
+period of the underlying random generator is high, so creating lot's of random
+UUIDs on one client is fine, but please be aware that since the initial random
+seed of the current Random implementation is limited to 32 bits, creating
+UUIDs on many independent clients may lead to collisions more quickly than you
+think (see <https://github.com/danyx23/elm-uuid/issues/10> for details)!
 
 This library is split into two Modules. Uuid (this module) wraps Uuids in
 an opaque type for improved type safety. If you prefer to simply get strings
@@ -75,8 +79,8 @@ fromString text =
         Nothing
 
 
-{-| Random.PCG Generator for Uuids. Using this Generator instead of the generate
-function let's you use the full power of the Random.PCG to create lists of Uuids,
+{-| Random Generator for Uuids. Using this Generator instead of the generate
+function let's you use the full power of the Generator to create lists of Uuids,
 map them to other types etc.
 -}
 uuidGenerator : Generator Uuid

@@ -12,10 +12,6 @@ import Uuid exposing (..)
 import Uuid.Barebones exposing (..)
 
 
-randomInt =
-    Random.int
-
-
 buildUuid integer =
     let
         initialSeed =
