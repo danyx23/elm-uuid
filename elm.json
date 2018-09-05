@@ -3,7 +3,7 @@
     "name": "danyx23/elm-uuid",
     "summary": "Create UUIDs (Version 4) - 128 bit pseudo-random identifiers",
     "license": "BSD-3-Clause",
-    "version": "2.1.0",
+    "version": "2.1.2",
     "exposed-modules": [
         "Uuid",
         "Uuid.Barebones"
