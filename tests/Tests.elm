@@ -1,42 +1,34 @@
-module Tests exposing (..)
+module Tests exposing (all)
 
 --import Check exposing (claim, claimTrue, that, is, true, false, for, quickCheck)
 --import Check.Test exposing (evidenceToTest)
 
-import Test exposing (..)
-import String
 import Expect
-import Uuid.Barebones exposing (..)
-import Uuid exposing (..)
-import Random.Pcg exposing (step, initialSeed)
-import Random
 import Fuzz
-import Shrink
-
-
-randomInt =
-    Random.Pcg.int Random.Pcg.minInt Random.Pcg.maxInt
+import Random exposing (initialSeed, step)
+import String
+import Test exposing (..)
+import Uuid exposing (..)
+import Uuid.Barebones exposing (..)
 
 
 buildUuid integer =
     let
         initialSeed =
-            Random.Pcg.initialSeed integer
+            Random.initialSeed integer
 
         ( uuid, seed ) =
             step uuidGenerator initialSeed
     in
-        uuid
+    uuid
 
 
 initialSeedFuzzer =
-    Fuzz.custom
-        (randomInt |> Random.Pcg.map Random.Pcg.initialSeed)
-        Shrink.noShrink
+    Fuzz.map Random.initialSeed Fuzz.int
 
 
 uuidFuzzer =
-    Fuzz.custom (randomInt |> Random.Pcg.map buildUuid) Shrink.noShrink
+    Fuzz.map buildUuid Fuzz.int
 
 
 all : Test
@@ -58,10 +50,10 @@ all =
                     ( uuid, nextSeed ) =
                         step uuidGenerator initialSeed
                 in
-                    uuid
-                        |> Uuid.toString
-                        |> isValidUuid
-                        |> Expect.true "should be valid uuid"
+                uuid
+                    |> Uuid.toString
+                    |> isValidUuid
+                    |> Expect.true "should be valid uuid"
         , fuzz initialSeedFuzzer "generate two uuids" <|
             \initialSeed ->
                 let
@@ -71,7 +63,7 @@ all =
                     ( uuid2, seed2 ) =
                         step uuidGenerator seed1
                 in
-                    Expect.notEqual uuid1 uuid2
+                Expect.notEqual uuid1 uuid2
         , fuzz uuidFuzzer "roundtripping uuid through toString -> fromString keeps the Uuids intact" <|
             \uuid ->
                 uuid
