@@ -18,8 +18,9 @@ Depending on your use case the randomness provided may not be enough. The
 period of the underlying random generator is high, so creating lot's of random
 UUIDs on one client is fine, but please be aware that since the initial random
 seed of the current Random implementation is limited to 32 bits, creating
-UUIDs on many independent clients may lead to collisions more quickly than you
-think (see https://github.com/danyx23/elm-uuid/issues/10 for details)!
+UUIDs on *many independent clients* may lead to collisions more quickly than you
+think (see https://github.com/danyx23/elm-uuid/issues/10 for details)! If you need
+to generate UUIDs on many clients independently, please use the fork https://package.elm-lang.org/packages/Zinggi/elm-uuid/latest which covers this case.
 
 This library is split into two Modules. Uuid wraps Uuids in
 an opaque type for improved type safety. If you prefer to simply get strings
