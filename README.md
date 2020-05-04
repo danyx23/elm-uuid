@@ -1,3 +1,7 @@
+## Elm 0.19
+
+Use [the NoRedInk fork](https://github.com/NoRedInk/elm-uuid)
+
 # Elm Uuid
 **This is a Fork** from [danyx23/elm-uuid](https://github.com/danyx23/elm-uuid).
 It uses the [PCG-extended](http://package.elm-lang.org/packages/Zinggi/elm-random-pcg-extended/latest) PRNG to [provide enough randomness when generating UUIDs on different clients](https://github.com/danyx23/elm-uuid/issues/10).
