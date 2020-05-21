@@ -1,5 +1,7 @@
 # Elm Uuid
 
+**Note:** this package has been forked with a few updates for 0.19 and is now maintained at: https://package.elm-lang.org/packages/NoRedInk/elm-uuid/2.0.0/
+
 This package provides an opaque type for Uuids, helpers to serialize
 from and to String and helpers to generate new Uuids using Elm's
 [Random](https://package.elm-lang.org/packages/elm/random/latest/) package.
