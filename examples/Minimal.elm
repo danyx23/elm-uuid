@@ -1,4 +1,4 @@
-module MinimalExample exposing (main)
+module Minimal exposing (main)
 
 import Browser exposing (element)
 import Html exposing (Html, button, div, text)
